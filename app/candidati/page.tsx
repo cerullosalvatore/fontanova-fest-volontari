@@ -28,8 +28,8 @@ export default function ListaCandidati() {
     return (
         <main className="min-h-screen bg-gray-50 p-4 sm:p-8">
             <div className="max-w-2xl mx-auto">
-                <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Candidati</h1>
-                <p className="text-gray-500 mb-8">Elenco dei volontari iscritti al festival.</p>
+                <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Membri della Crew</h1>
+                <p className="text-gray-500 mb-8">Elenco dei membri Fontanova Fest.</p>
 
                 <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex justify-between items-center">
                     <span className="text-sm font-bold text-gray-600">Totale Candidati</span>
