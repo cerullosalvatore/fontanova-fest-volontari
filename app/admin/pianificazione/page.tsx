@@ -2,6 +2,9 @@ import AssignmentForm from "@/components/admin/AssignmentForm";
 import AssignmentList from "@/components/admin/AssignmentList";
 import { supabase } from "@/lib/supabase";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function PianificazionePage() {
 
     const { data: roles, error: rolesError } = await supabase

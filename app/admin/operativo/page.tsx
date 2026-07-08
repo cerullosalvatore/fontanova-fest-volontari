@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import OperativoView from "@/components/admin/OperativoView";
-
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 const categorie: any = {
     "Addetto griglia": "Cucina",
     "Addetto farcitura panini": "Cucina",
