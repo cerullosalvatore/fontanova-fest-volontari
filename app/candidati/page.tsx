@@ -14,7 +14,8 @@ export default function ListaCandidati() {
             const { data } = await supabase
                 .from("volunteers")
                 .select("id, nome, cognome, email")
-                .order("cognome");
+                .order("nome", { ascending: true })
+                .order("cognome", { ascending: true });
             setVolunteers(data || []);
             setLoading(false);
         }
