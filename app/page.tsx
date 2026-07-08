@@ -22,9 +22,15 @@ export default function Home() {
                         Iscriviti
                     </Link>
                 </div>
-
+                <div>
+                    <Link
+                        href="/candidati"
+                        className="text-xs font-bold text-gray-400 hover:text-gray-900 uppercase tracking-widest transition-colors"
+                    >
+                        Fontanova Crew
+                    </Link>
+                </div>
             </div>
-
         </main>
     );
 }
