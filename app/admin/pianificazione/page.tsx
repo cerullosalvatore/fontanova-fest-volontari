@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import {useState} from "react";
+import {supabase} from "@/lib/supabase";
 
 export default function PianificazionePage() {
     const [isGenerating, setIsGenerating] = useState(false);
@@ -23,7 +23,7 @@ export default function PianificazionePage() {
                 .neq("id", "00000000-0000-0000-0000-000000000000");
 
             setMessage("Calcolo nuovi incastri...");
-            const { data: volunteers, error: fetchError } = await supabase
+            const {data: volunteers, error: fetchError} = await supabase
                 .from("volunteers")
                 .select(`id, availability(data), preferences(posizione, roles(nome))`);
 
@@ -32,13 +32,18 @@ export default function PianificazionePage() {
             const nuoviTurni = [];
 
             for (const vol of volunteers || []) {
+                // 1. Cerchiamo la prima scelta in modo sicuro
                 const primaScelta = vol.preferences?.find((p: any) => p.posizione === 1);
 
-                if (primaScelta?.roles?.nome && vol.availability && vol.availability.length > 0) {
+// 2. Usiamo una verifica più permissiva per TypeScript
+// Accediamo a 'roles' e poi a 'nome' usando la notazione con parentesi o opzionale
+                const nomeRuolo = primaScelta?.roles?.nome;
+
+                if (nomeRuolo && vol.availability && vol.availability.length > 0) {
                     for (const disp of vol.availability) {
                         nuoviTurni.push({
                             volunteer_id: vol.id,
-                            ruolo: primaScelta.roles.nome,
+                            ruolo: nomeRuolo, // Qui usiamo la variabile estratta
                             data: disp.data
                         });
                     }
@@ -47,7 +52,7 @@ export default function PianificazionePage() {
 
             if (nuoviTurni.length > 0) {
                 setMessage(`Salvataggio di ${nuoviTurni.length} assegnazioni...`);
-                const { error: insertError } = await supabase.from("assignments").insert(nuoviTurni);
+                const {error: insertError} = await supabase.from("assignments").insert(nuoviTurni);
 
                 if (insertError) throw insertError;
                 setMessage(`Successo! Generati ${nuoviTurni.length} turni basati sulla prima scelta.`);
@@ -72,7 +77,7 @@ export default function PianificazionePage() {
         setMessage("Cancellazione in corso...");
 
         try {
-            const { error } = await supabase
+            const {error} = await supabase
                 .from("assignments")
                 .delete()
                 .neq("id", "00000000-0000-0000-0000-000000000000");
@@ -99,7 +104,8 @@ export default function PianificazionePage() {
                     <div className="mb-6 flex justify-center gap-4">
                         {/* Icona Bozza */}
                         <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                         </svg>
                     </div>
 
