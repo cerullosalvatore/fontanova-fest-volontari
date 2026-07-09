@@ -32,18 +32,20 @@ export default function PianificazionePage() {
             const nuoviTurni = [];
 
             for (const vol of volunteers || []) {
-                // 1. Cerchiamo la prima scelta in modo sicuro
+                // 1. Trova la preferenza
                 const primaScelta = vol.preferences?.find((p: any) => p.posizione === 1);
 
-// 2. Usiamo una verifica più permissiva per TypeScript
-// Accediamo a 'roles' e poi a 'nome' usando la notazione con parentesi o opzionale
-                const nomeRuolo = primaScelta?.roles?.nome;
+                // 2. Se roles è un array, prendiamo il primo elemento [0]
+                // Alcuni driver Supabase restituiscono il join come array anche se è un 1:1
+                const ruolo = Array.isArray(primaScelta?.roles)
+                    ? primaScelta.roles[0]?.nome
+                    : primaScelta?.roles?.nome;
 
-                if (nomeRuolo && vol.availability && vol.availability.length > 0) {
+                if (ruolo && vol.availability && vol.availability.length > 0) {
                     for (const disp of vol.availability) {
                         nuoviTurni.push({
                             volunteer_id: vol.id,
-                            ruolo: nomeRuolo, // Qui usiamo la variabile estratta
+                            ruolo: ruolo,
                             data: disp.data
                         });
                     }
