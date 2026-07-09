@@ -32,17 +32,20 @@ export default function PianificazionePage() {
             const nuoviTurni = [];
 
             for (const vol of volunteers || []) {
-                // 1. Trova la preferenza
-                const primaScelta = vol.preferences?.find((p: any) => p.posizione === 1);
+                // Castiamo la preferenza a 'any' per ignorare i limiti del compilatore su quella specifica struttura
+                const preferenze = vol.preferences as any;
+                const primaScelta = preferenze?.find((p: any) => p.posizione === 1);
 
-                // 2. Se roles è un array, prendiamo il primo elemento [0]
-                // Alcuni driver Supabase restituiscono il join come array anche se è un 1:1
-                const ruolo = Array.isArray(primaScelta?.roles)
-                    ? primaScelta.roles[0]?.nome
-                    : primaScelta?.roles?.nome;
+                // Accediamo a roles come 'any' per evitare l'errore "Property 'nome' does not exist"
+                const rolesData = primaScelta?.roles as any;
 
-                if (ruolo && vol.availability && vol.availability.length > 0) {
-                    for (const disp of vol.availability) {
+                // Gestiamo sia il caso oggetto che il caso array
+                const ruolo = Array.isArray(rolesData)
+                    ? rolesData[0]?.nome
+                    : rolesData?.nome;
+
+                if (ruolo && vol.availability && (vol.availability as any[]).length > 0) {
+                    for (const disp of vol.availability as any[]) {
                         nuoviTurni.push({
                             volunteer_id: vol.id,
                             ruolo: ruolo,
