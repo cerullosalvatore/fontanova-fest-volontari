@@ -1,15 +1,15 @@
 "use client";
 
-import {useEffect, useState} from "react";
-import {supabase} from "@/lib/supabase";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function CandidaturePage() {
     const [volunteers, setVolunteers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState(""); // Stato per la barra di ricerca
 
     async function fetchData() {
-        // Recuperiamo tutto includendo le relazioni
-        const {data, error} = await supabase
+        const { data, error } = await supabase
             .from("volunteers")
             .select(`
                 id, nome, cognome, telefono, email, note,
@@ -17,7 +17,7 @@ export default function CandidaturePage() {
                 availability(data)
             `)
             .order("cognome")
-            .neq("id", "00000000-0000-0000-0000-000000000000"); // TRUCCO: forza Supabase a non usare la cache;
+            .neq("id", "00000000-0000-0000-0000-000000000000");
 
         if (error) console.error(error);
         else setVolunteers(data || []);
@@ -31,19 +31,48 @@ export default function CandidaturePage() {
     async function eliminaCandidatura(id: string) {
         if (!window.confirm("Sei sicuro? Questa azione eliminerà anche le disponibilità e preferenze associate.")) return;
 
-        const {error} = await supabase.from("volunteers").delete().eq("id", id);
+        const { error } = await supabase.from("volunteers").delete().eq("id", id);
         if (error) alert("Errore durante l'eliminazione");
         else setVolunteers(volunteers.filter(v => v.id !== id));
     }
 
+    // Filtra i volontari in base a nome, cognome o email
+    const filteredVolunteers = volunteers.filter((v: any) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            v.nome?.toLowerCase().includes(query) ||
+            v.cognome?.toLowerCase().includes(query) ||
+            v.email?.toLowerCase().includes(query)
+        );
+    });
+
     return (
         <main className="min-h-screen bg-gray-50 p-4 sm:p-8">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-3xl font-extrabold text-gray-900 mb-8">Candidature volontari</h1>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                    <h1 className="text-3xl font-extrabold text-gray-900">Candidature volontari</h1>
 
-                {loading ? <p>Caricamento...</p> : (
+                    {/* Barra di ricerca */}
+                    <div className="w-full md:w-80">
+                        <input
+                            type="text"
+                            placeholder="Cerca per nome, cognome o email..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900"
+                        />
+                    </div>
+                </div>
+
+                {loading ? (
+                    <p>Caricamento...</p>
+                ) : filteredVolunteers.length === 0 ? (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                        <p className="text-gray-500 text-sm">Nessun candidato corrisponde ai criteri di ricerca.</p>
+                    </div>
+                ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {volunteers.map((v: any) => (
+                        {filteredVolunteers.map((v: any) => (
                             <div key={v.id}
                                  className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                                 <h2 className="text-xl font-bold text-gray-900">{v.nome} {v.cognome}</h2>
@@ -67,8 +96,7 @@ export default function CandidaturePage() {
 
                                 {/* Preferenze */}
                                 <div className="mb-4">
-                                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Ruoli
-                                        preferiti</h3>
+                                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Ruoli preferiti</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {v.preferences?.sort((a: any, b: any) => a.posizione - b.posizione).map((p: any) => (
                                             <span key={p.posizione}
