@@ -49,21 +49,34 @@ export default function OperativoView({ struttura, ruoliDisponibili, panchina, t
 
     return (
         <div className="w-full relative">
-            <div className="flex flex-wrap gap-4 mb-8">
-                {giorni.map((g) => (
-                    <button
-                        key={g}
-                        onClick={() => setGiornoAttivo(g)}
-                        className={`px-6 py-4 rounded-xl font-bold uppercase tracking-wider transition-all shadow-sm flex items-center gap-3 ${
-                            giornoAttivo === g
-                                ? "bg-black text-white transform scale-105"
-                                : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-100"
-                        }`}
-                    >
-                        <span>{g === "2026-07-24" ? "Venerdì 24 Luglio" : g === "2026-07-25" ? "Sabato 25 Luglio" : g}</span>
-                    </button>
-                ))}
+            {/* INTESTAZIONE CON TASTO PDF */}
+            <div className="flex justify-between items-end mb-8">
+                {/* Tasti Giorni */}
+                <div className="flex flex-wrap gap-4">
+                    {giorni.map((g) => (
+                        <button
+                            key={g}
+                            onClick={() => setGiornoAttivo(g)}
+                            className={`px-6 py-4 rounded-xl font-bold uppercase tracking-wider transition-all shadow-sm flex items-center gap-3 ${
+                                giornoAttivo === g
+                                    ? "bg-black text-white transform scale-105"
+                                    : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-100"
+                            }`}
+                        >
+                            <span>{g === "2026-07-24" ? "Venerdì 24 Luglio" : g === "2026-07-25" ? "Sabato 25 Luglio" : g}</span>
+                        </button>
+                    ))}
+                </div>
+
+                {/* Tasto Esporta PDF */}
+                <button
+                    onClick={() => window.print()}
+                    className="bg-red-600 text-white px-6 py-4 rounded-xl font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-500/20 print:hidden"
+                >
+                    Esporta PDF
+                </button>
             </div>
+
 
             <div className="space-y-8">
                 {Object.entries(struttura[giornoAttivo]).map(([categoria, ruoli]: [string, any]) => {
@@ -157,7 +170,7 @@ export default function OperativoView({ struttura, ruoliDisponibili, panchina, t
                 </div>
             )}
             {/* PANCHINA */}
-            <div className="w-full bg-gray-900 rounded-2xl p-8 text-white">
+            <div className="w-full bg-gray-900 rounded-2xl p-8 text-white mt-8">
                 <h2 className="text-2xl font-black uppercase mb-6 border-b border-gray-700 pb-4">Panchina ({panchina[giornoAttivo]?.length || 0})</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {panchina[giornoAttivo]?.map((p: any) => (
